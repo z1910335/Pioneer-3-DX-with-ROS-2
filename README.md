@@ -3,21 +3,28 @@ ROS2 package of the Final Project for MEE625 Robot Programming &amp; Control Fal
 <img width="1170" height="711" alt="image" src="https://github.com/user-attachments/assets/3ea92a4c-7c06-4d7f-bb2d-522cba070a1e" />
 
 ROS2 Package Name: pioneer3
+
 Robot: Pioneer 3 (P3-DX) by Mobile Robots Inc. (Located in Omron Lab)
+
 	- Has onboard computer than can run Ubuntu 24.04
 	- Has ROS2 Jazzy Installed
 	- Has Internet Connection
 	- Has ports that can establish connection to Monitor, Mouse, Keyboard, etc
 	- TODO: Remote connection while ROS2 Control Package is running
+
 Sensor: LiDAR RPLIDAR A1M8
+
 	- 360&deg; scanning (rotation sensor)
 	- Will be mounted on top of the Pioneer 3
 		- 3D-Printed design piece needed to raise sensor above P3's antenna 
-Project Plan: Create a ROS2 Package that can control the robot.
+
+Project Plan: Create a ROS2 Package that can control the robot
+
 	- pioneer_aria (driver) 
 	- Teleop Node (Manual Control)
 	- Sensor Node (Collect sensor data and publish it)
 	- Display Node
+
 ROS2 Node Structure:
 
 	teleop_twist_keyboard  ──/cmd_vel──▶  pioneer_aria (driver)  ──/odom──▶  display_node
@@ -28,6 +35,7 @@ ROS2 Node Structure:
 
 
 Stretch Goal (if time permits): Implement some sort of autonomous function via additional nodes 
+
 	- Zero compromise to functionality of manual control node structure
 
 ---
@@ -35,19 +43,24 @@ Stretch Goal (if time permits): Implement some sort of autonomous function via a
 # Step 0: Prerequisites
 
 ## Assumptions (No Instruction):
+
 - Ubuntu 24.04
 - ROS2 Jazzy
 - ~/ros2_ws/src in your directory
 
 ## 0.1 Hardware Access (serial &amp; udev)
+
 This is for machines that will open USB/serial ports (plug in) on the robot.
+
 /dev/ttyUSB*//dev/ttyACM* (robot’s PC; laptop if you plug the robot or LiDAR into it).
+
 Not needed for machines that will connect over the network (wifi).
+
 ```
 sudo usermod -a -G dialout $USER   # log out/in afterwards
 ```
-Log out and back in (or reboot) so the dialout group takes effect
 
+Log out and back in (or reboot) so the dialout group takes effect
 
 ## 0.2 Basic Tools
 ```
@@ -105,7 +118,11 @@ ldconfig -p | grep Aria # Should see libAria.so under /usr/local/lib
 
 # Step 2: Add this GitHub Project to Your Workspace
 
-## 2.1 Configure Your Identity (if you haven't already. I think this has to be what's on GitHub)
+## 2.1 Configure Your Identity
+
+The Name can be whatever you want to be called on GitHub.
+
+The email needs to be the same as the email on your GitHub account.
 ```
 cd ~
 git config --global user.name "Your Name"
@@ -150,7 +167,9 @@ rosdep install -i \
 ```
 
 ## 3.4 Sourcing
+
 Sourcing for every new Terminal is annoying.
+
 Add sourcing to ```~/.bashrc. ``` so ROS2 and Install are sourced Automatically.
 
 ### 3.4.1
@@ -158,15 +177,23 @@ Add sourcing to ```~/.bashrc. ``` so ROS2 and Install are sourced Automatically.
 cd ~
 nano ~/.bashrc
 ```
+
 ### 3.4.2
+
 Add the following lines at the end of the script (if not already present):
 ```source /opt/ros/jazzy/setup.bash```
 ```source ~/ros2_ws/install/setup.bash```
+
 ### 3.4.3
+
 **ctrl** + **x** to Exit
-Select Y to confirm and save changes
+
+Select **Y** to confirm and save changes
+
 Press **Enter** to return to the Terminal
+
 ### 3.4.4
+
 Restart Terminal or ```source ~/.bashrc``` after this step to implement the changes
 
 ---
@@ -178,10 +205,12 @@ For private repositories, tokens are required.
 ## 4.1 Go to Settings &rarr; Developer Settings &rarr; Personal Access Tokens &rarr; Fine-Grained Tokens
 
 ## 4.2 Create a New Token:
+
 	- Repository Access: Only Select Repositories
 	- Choose **z1910335/MEE625_FinalProject**
 	- Under Repository Permissions, Click ** Add Permissions**:
 		- Contents &rarr; Read and Write
+		
 ## 4.3 Generate the Token and COPY IT TO SOMEWHERE SAFE TO USE LATER 
 	- This is now the "Password" You use to ```git pull``` &amp; ```git push```
 	- Anyone with this token can push to the repo as you
