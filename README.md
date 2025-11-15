@@ -5,22 +5,22 @@ ROS2 package of the Final Project for MEE625 Robot Programming &amp; Control Fal
 ROS2 Package Name: pioneer3
 
 Robot: Pioneer 3 (P3-DX) by Mobile Robots Inc. (Located in Omron Lab)
-	- Has onboard computer than can run Ubuntu 24.04
-	- Has ROS2 Jazzy Installed
-	- Has Internet Connection
-	- Has ports that can establish connection to Monitor, Mouse, Keyboard, etc
-	- TODO: Remote connection while ROS2 Control Package is running
+- Has onboard computer than can run Ubuntu 24.04
+- Has ROS2 Jazzy Installed
+- Has Internet Connection
+- Has ports that can establish connection to Monitor, Mouse, Keyboard, etc
+- TODO: Remote connection while ROS2 Control Package is running
 
 Sensor: LiDAR RPLIDAR A1M8
-	- 360&deg; scanning (rotation sensor)
-	- Will be mounted on top of the Pioneer 3
-		- 3D-Printed design piece needed to raise sensor above P3's antenna 
+- 360&deg; scanning (rotation sensor)
+- Will be mounted on top of the Pioneer 3
+	- 3D-Printed design piece needed to raise sensor above P3's antenna 
 
 Project Plan: Create a ROS2 Package that can control the robot
-	- pioneer_aria (driver) 
-	- Teleop Node (Manual Control)
-	- Sensor Node (Collect sensor data and publish it)
-	- Display Node
+- pioneer_aria (driver) 
+- Teleop Node (Manual Control)
+- Sensor Node (Collect sensor data and publish it)
+-  Display Node
 
 ROS2 Node Structure:
 
@@ -32,17 +32,17 @@ ROS2 Node Structure:
 
 
 Stretch Goal (if time permits): 
-	- Implement some sort of autonomous function via additional nodes 
-		- Zero compromise to functionality of manual control node structure
+- Implement some sort of autonomous function via additional nodes 
+	- Zero compromise to functionality of manual control node structure
 
 ---
 
 # Step 0: Prerequisites
 
 Assumptions (No Instruction):
-	- Ubuntu 24.04
-	- ROS2 Jazzy
-	- ~/ros2_ws/src in your directory
+- Ubuntu 24.04
+- ROS2 Jazzy
+- ~/ros2_ws/src in your directory
 
 ## 0.1 Hardware Access (serial &amp; udev)
 
@@ -186,9 +186,9 @@ source ~/ros2_ws/install/setup.bash
 ### 3.4.3
 
 Exit Nano:
-	- **ctrl** + **x** to Exit
-	- Select **Y** to confirm and save changes
-	- Press **Enter** to return to the Terminal
+- **ctrl** + **x** to Exit
+- Select **Y** to confirm and save changes
+- Press **Enter** to return to the Terminal
 
 ### 3.4.4
 
@@ -204,10 +204,10 @@ For private repositories, tokens are required.
 
 ## 4.2 Create a New Token:
 
-Repository Access: **Only Select Repositories**
-Choose **z1910335/MEE625_FinalProject**
-Under Repository Permissions, Click **Add Permissions**:
-Contents &rarr; Read and Write
+- Repository Access: **Only Select Repositories**
+- Choose **z1910335/MEE625_FinalProject**
+- Under Repository Permissions, Click **Add Permissions**:
+- Contents &rarr; Read and Write
 		
 ## 4.3 Generate the Token and COPY IT TO SOMEWHERE SAFE TO USE LATER 
 
