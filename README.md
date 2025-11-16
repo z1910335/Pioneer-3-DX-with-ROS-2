@@ -20,7 +20,7 @@ Project Plan: Create a ROS2 Package that can control the robot
 - pioneer_aria Node (driver) 
 - Teleop Node (Manual Control)
 - Sensor Node (Collect sensor data and publish it)
--  Display Node
+-  Display Node (Display sensor readings and odom)
 
 ROS2 Node Structure:
 
@@ -255,7 +255,7 @@ colcon build --symlink-install \
   --packages-select pioneer_common pioneer_core pioneer_msgs pioneer_modules pioneer_aria pioneer3
 ```
 
-IFF this is your first time building the package (install didn't exist until now: Need to source it!)
+IFF this is your first time building the package (install didn't exist until now: Need to source it!):
 ```
 source install/setup.bash # or ```. install/setup.bash``` Fun Fact: . and **source** are synonymous!
 ```
