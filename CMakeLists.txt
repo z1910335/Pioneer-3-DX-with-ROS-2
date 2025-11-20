@@ -13,6 +13,8 @@ find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(pioneer_msgs REQUIRED)
+find_package(ament_cmake_python REQUIRED)
+
 
 # C++ node:
 add_executable(base_controller src/base_controller.cpp)
