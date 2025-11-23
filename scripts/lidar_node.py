@@ -8,8 +8,7 @@ from sensor_msgs.msg import LaserScan
 class LidarNode(Node):
     def __init__(self):
         super().__init__("lidar_node")
-
-        # Subscribe to the raw lidar scan; adjust topic if your driver uses a different name.
+        # Subscribe to the raw lidar scan
         self.subscription = self.create_subscription(
             LaserScan,
             "scan",
@@ -18,7 +17,7 @@ class LidarNode(Node):
         )
 
     def scan_callback(self, msg: LaserScan):
-        # Simple example: log the minimum range in the scan
+        # log the minimum range in the scan:
         if msg.ranges:
             min_range = min(msg.ranges)
             self.get_logger().info(f"Nearest obstacle: {min_range:.2f} m")

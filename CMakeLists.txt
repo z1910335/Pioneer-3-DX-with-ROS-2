@@ -16,6 +16,10 @@ find_package(pioneer_msgs REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 
 
+# ARIA – adjust paths if your lab uses something different
+include_directories(/usr/local/Aria/include)
+link_directories(/usr/local/Aria/lib)
+
 # C++ node:
 add_executable(base_controller src/base_controller.cpp)
 ament_target_dependencies(base_controller
@@ -42,14 +46,10 @@ install(DIRECTORY
   DESTINATION share/${PROJECT_NAME}
 )
 
-
-
-
-
-
-
-
-
+target_link_libraries(base_controller
+  Aria
+  pthread
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

@@ -1,54 +1,36 @@
 from launch import LaunchDescription
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
+from ament_index_python.packages import get_package_share_directory
+
+import os
 
 
 def generate_launch_description():
-    pioneer_aria = Node(
-        package="pioneer_aria",
-        executable="pioneer_aria_node",  # double-check with `ros2 pkg executables pioneer_aria`
-        name="pioneer_base",
-        parameters=[{
-            "port": "/dev/ttyS0",   # TODO: correct port on the robot
-            "baud": 9600,
-        }],
-        output="screen",
+    # --- LiDAR (SLLIDAR A1) ---
+    sllidar_share_dir = get_package_share_directory('sllidar_ros2')
+    sllidar_launch_path = os.path.join(
+        sllidar_share_dir,
+        'launch',
+        'view_sllidar_a1_launch.py'
     )
 
+    lidar_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(sllidar_launch_path)
+    )
+
+    # --- Pioneer base controller node ---
     base_controller = Node(
-        package="pioneer3",
-        executable="base_controller",
-        name="base_controller",
-        output="screen",
-    )
-
-    lidar = Node(
-        package="pioneer3",
-        executable="lidar_node.py",
-        name="lidar_node",
-        output="screen",
-    )
-
-    static_tf = Node(
-        package="tf2_ros",
-        executable="static_transform_publisher",
-        name="base_to_laser_tf",
-        # x y z roll pitch yaw  parent      child
-        arguments=["0.0", "0.0", "0.25", "0", "0", "0", "base_link", "base_laser"],
-        output="screen",
-    )
-
-    rviz = Node(
-        package="rviz2",
-        executable="rviz2",
-        name="rviz2",
-        # you can add a config later: arguments=["-d", "<path-to>/pioneer3.rviz"]
-        output="screen",
+        package='pioneer3',
+        executable='base_controller',
+        name='pioneer_base',
+        output='screen',
+        # pass through the ARIA argument for the serial port
+        arguments=['-robotPort', '/dev/ttyS0'],
     )
 
     return LaunchDescription([
-        pioneer_aria,
+        lidar_launch,
         base_controller,
-        lidar,
-        static_tf,
-        rviz,
     ])
