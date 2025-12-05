@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 
+# ! ! ! ! ! ! ! ! ! ! ! ! !
+# This custom node is no longer used!
+# Now used: sllidar
+# ! ! ! ! ! ! ! ! ! ! ! ! !
+
+
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan

@@ -4,7 +4,8 @@
   <name>pioneer3</name>
   <version>0.0.0</version>
   <description>Pioneer3 MEE625 Final Project</description>
-  <maintainer email="giffomatic@gmail.com">giffomatic</maintainer>
+  <maintainer email="z1910335@students.niu.edu">Nickolas_Giffen</maintainer>
+  <maintainer email="z2016001@students.niu.edu">Oluwatobi_Kushimo</maintainer>
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>

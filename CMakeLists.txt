@@ -16,7 +16,7 @@ find_package(pioneer_msgs REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 
 
-# ARIA – adjust paths if your lab uses something different
+# ARIA
 include_directories(/usr/local/Aria/include)
 link_directories(/usr/local/Aria/lib)
 

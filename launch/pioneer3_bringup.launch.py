@@ -8,7 +8,7 @@ import os
 
 
 def generate_launch_description():
-    # --- LiDAR (SLLIDAR A1) ---
+    # LiDAR (SLLIDAR A1)
     sllidar_share_dir = get_package_share_directory('sllidar_ros2')
     sllidar_launch_path = os.path.join(
         sllidar_share_dir,
@@ -20,7 +20,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(sllidar_launch_path)
     )
 
-    # --- Pioneer base controller node ---
+    # Pioneer base controller node
     base_controller = Node(
         package='pioneer3',
         executable='base_controller',

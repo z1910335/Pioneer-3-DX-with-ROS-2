@@ -59,7 +59,7 @@ int main(int argc, char** argv)
   // Enable motors and set some safe limits
   robot.lock();
   robot.enableMotors();
-  robot.setTransVelMax(300.0); // mm/s (~0.3 m/s)
+  robot.setTransVelMax(300.0); // mm/s (0.3 m/s)
   robot.setRotVelMax(40.0); // deg/s
   robot.unlock();
 
