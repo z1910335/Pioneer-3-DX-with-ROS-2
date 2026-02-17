@@ -544,7 +544,98 @@ As you extend the project, you can add new launch files to start the driver, LiD
 
 ---
 
-# 17. Summary
+## 17. Auto-start bringup on boot (no Ubuntu login required)
+
+If you want the robot to start the ROS 2 bringup automatically whenever it powers on (without logging into the Ubuntu user), you can run the bringup using a `systemd` service.
+
+Important: This is intended for headless bringup (drivers, LiDAR, TF, etc.). Do NOT auto-start RViz on the robot. RViz should run on the laptop.
+
+### 17.1 Create a start script (Robot PC)
+
+On the robot:
+```
+mkdir -p ~/bin
+nano ~/bin/start_pioneer_bringup.sh
+```
+Paste:
+```
+#!/usr/bin/env bash
+set -e
+
+source /opt/ros/jazzy/setup.bash
+source /home/easel/ros2_ws/install/setup.bash
+
+export ROS_DOMAIN_ID=7
+export ROS_LOCALHOST_ONLY=0
+export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+
+exec ros2 launch pioneer3 pioneer3_bringup.launch.py
+```
+Make it executable:
+```
+chmod +x ~/bin/start_pioneer_bringup.sh
+```
+### 17.2 Create a systemd service (Robot PC)
+
+Create the service file:
+```
+sudo nano /etc/systemd/system/pioneer_bringup.service
+```
+Paste:
+```
+[Unit]
+Description=Pioneer3 ROS2 Bringup (headless)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=easel
+WorkingDirectory=/home/easel/ros2_ws
+ExecStart=/home/easel/bin/start_pioneer_bringup.sh
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
+```
+Enable and start it:
+```
+sudo systemctl daemon-reload
+sudo systemctl enable pioneer_bringup.service
+sudo systemctl start pioneer_bringup.service
+```
+### 17.3 Verify / manage the service
+
+Check status:
+```
+systemctl status pioneer_bringup.service --no-pager
+```
+View logs:
+```
+journalctl -u pioneer_bringup.service -n 50 --no-pager
+```
+Stop / start:
+```
+sudo systemctl stop pioneer_bringup.service
+sudo systemctl start pioneer_bringup.service
+```
+Disable auto-start:
+```
+sudo systemctl disable pioneer_bringup.service
+```
+### 17.4 Test reboot
+
+Reboot the robot:
+```
+sudo reboot
+```
+After the robot is back on the network (no login required), you should be able to discover topics from your laptop (with matching ROS_DOMAIN_ID and RMW):
+```
+ros2 topic list | egrep "(/scan|/tf|/tf_static|/cmd_vel)"
+```
+
+# 18. Summary
 This manual has described, in reproducible detail, how to:
 - Prepare a ROS 2 workspace on the Pioneer 3-DX onboard PC.
 - Install the pioneer_ros2 driver stack and the AriaCoda library.
@@ -557,7 +648,7 @@ A new student should be able to follow this manual from a fresh Ubuntu 24.04 + R
 
 ---
 
-# 18. References
+# 19. References
 1. pioneer_ros2 GitHub repository – Pioneer 3-DX ROS 2 driver and core packages. https://github.com/grupo-avispa/pioneer_ros2
 2. AriaCoda (Aria) GitHub repository – Aria library used by Pioneer drivers. https://github.com/grupo-avispa/AriaCoda
 3. ROS 2 Jazzy Documentation – Installation, colcon, rosdep, TF2, and RViz2 usage.https://docs.ros.org/en/jazzy/
