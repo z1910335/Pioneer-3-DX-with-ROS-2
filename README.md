@@ -655,3 +655,116 @@ A new student should be able to follow this manual from a fresh Ubuntu 24.04 + R
 4. teleop_twist_keyboard package – ROS 2 teleoperation package. https://github.com/ros2/teleop_twist_keyboard
 5. RPLIDAR ROS driver – Example LiDAR driver repositories. https://github.com/Slamtec/sllidar_ros2
 6. MEE625_FinalProject GitHub repository – Course project code for the pioneer3 package. https://github.com/z1910335/MEE625_FinalProject
+
+
+# B. Supplementary (Beyond MEE625)
+
+# B.0 Custom RViz Dashboard Panel (Camera + LiDAR + Teleop)
+
+This section documents an optional RViz2 plugin panel (`pioneer_dashboard_rviz::DashboardPanel`) that adds an operator “dashboard” inside RViz. The dashboard combines:
+- A live **camera** preview (subscribes to an image topic)
+- A mini **LiDAR** view (subscribes to `/scan`)
+- Built-in **teleop** controls that publish `geometry_msgs/Twist` to `/cmd_vel` (**no separate terminal teleop required**)
+
+> Important: RViz plugins are shared libraries. They must be **built on the same machine where RViz is running** (robot PC or laptop PC).
+
+---
+
+## B.1 What you should see in RViz
+
+After installing the plugin and adding the panel, RViz will show:
+- The normal RViz visualization area (grid + your displays such as LaserScan and TF)
+- A docked panel (DashboardPanel) with:
+  - **Topics**: Image / Scan / cmd_vel fields + **Apply / Reconnect**
+  - **Camera**: live video widget
+  - **LiDAR (mini view)**: radar-like view
+  - **Teleop**: “Enable teleop (deadman)”, speed sliders, direction buttons, STOP
+
+---
+
+## B.2 Build and install the plugin (on the machine running RViz)
+
+### B.2.1 Dependencies
+On Ubuntu 24.04 / ROS 2 Jazzy:
+```bash
+sudo apt update
+sudo apt install -y qtbase5-dev libopencv-dev ros-jazzy-cv-bridge
+```
+
+### B.2.2 Build (robot PC or laptop PC)
+If the package is already in your workspace:
+```bash
+cd ~/ros2_ws
+colcon build --symlink-install --packages-select pioneer_dashboard_rviz
+source install/setup.bash
+```
+
+## B.3 Add the panel in RViz
+Launch RViz:
+```bash
+source /opt/ros/jazzy/setup.bash
+source ~/ros2_ws/install/setup.bash
+rviz2
+```
+In RViz:
+
+  1. Panels → Add New Panel…
+  
+  2. Select: pioneer_dashboard_rviz::DashboardPanel
+
+In the panel’s Topics section, set (typical defaults):
+    Image: /camera/image_raw
+    Scan: /scan
+    cmd_vel: /cmd_vel
+
+Click Apply / Reconnect.
+
+## B.4 Visualizing LiDAR in the main RViz view
+The dashboard includes a mini LiDAR view, but for “full RViz-style” LiDAR visualization:
+    1. In RViz Displays, click Add
+    2. Choose LaserScan
+    3. Set Topic to /scan
+    4. Set Fixed Frame to a valid TF frame (laser, base_link, or odom depending on your setup)
+
+## B.5 Driving the robot from the panel (no terminal teleop)
+The dashboard panel can publish velocity commands directly to /cmd_vel.
+    1. Scroll down to Teleop
+    2. Check Enable teleop (deadman)
+    3. Hold ▲ / ▼ / ⟲ / ⟳ to move/turn
+    4. Release to stop, or click STOP
+    5. Use the Linear/Angular sliders to set speed
+
+## B.5.1 Sanity check (recommended)
+In a terminal (same network + same ROS 2 domain):
+```bash
+ros2 topic info /cmd_vel -v
+```
+Expected:
+    Subscription includes your base driver (e.g., pioneer_base)
+    Publisher includes RViz (rviz2) while teleop is enabled and the panel is active
+
+## B.6 Using the panel from a laptop (same network, no SSH)
+You can run RViz + DashboardPanel on your laptop while the robot runs bringup.
+Robot PC:
+    Start bringup (drivers, LiDAR node, TF, etc.)
+```bash
+cd ~/ros2_ws
+ros2 launch pioneer3 pioneer3_bringup.launch.py
+```
+Laptop PC:
+  1. Copy the package from the robot to the laptop (example using scp):
+```bash
+mkdir -p ~/ros2_ws/src
+scp -r easel@<ROBOT_IP>:~/ros2_ws/src/pioneer_dashboard_rviz ~/ros2_ws/src/
+```
+  2. Install dependencies and build on laptop:
+```bash
+cd ~/ros2_ws
+rosdep install --from-paths src --ignore-src -r -y
+colcon build --symlink-install
+source install/setup.bash
+```
+  3. Run RViz on laptop and add the panel:
+```bash
+rviz2
+```
