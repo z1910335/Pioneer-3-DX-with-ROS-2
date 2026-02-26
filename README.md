@@ -768,3 +768,48 @@ source install/setup.bash
 ```bash
 rviz2
 ```
+## B.7 Troubleshooting
+B.7.1 Panel does not appear in “Add New Panel…”
+Make sure you launched RViz from a terminal where you sourced your workspace:
+```
+source ~/ros2_ws/install/setup.bash
+rviz2
+```
+B.7.2 Robot does not move when using the panel
+  Ensure the dashboard’s cmd_vel field is set to /cmd_vel (absolute topic), then Apply / Reconnect
+  Confirm your base node is subscribing:
+```
+ros2 topic info /cmd_vel -v
+```
+B.7.3 Camera is black / no video
+  Confirm your image topic exists:
+```
+ros2 topic list | grep -i image
+ros2 topic echo /camera/image_raw --once
+```
+  Put the correct topic name in the panel and click Apply / Reconnect.
+B.7.4 Plugin load error: missing libraries (dlopen)
+If RViz reports a dlopen error when loading the panel library, check missing dependencies:
+```
+ldd ~/ros2_ws/install/pioneer_dashboard_rviz/lib/libpioneer_dashboard_panel.so | grep "not found"
+```
+### B.7.5 Qt Compatibility (Qt5 vs Qt6)
+
+RViz loads panels as shared libraries, so your panel **must be built against the same Qt major version as the RViz2 binary** on that machine. If you build the panel with Qt6 but RViz is Qt5 (or vice-versa), RViz will fail to load the panel with a pluginlib/dlopen error or a Qt major version conflict.
+
+**Check which Qt your RViz is using:**
+```bash
+ldd $(which rviz2) | grep -E "Qt5|Qt6" | head -n 20
+```
+  If you see libQt5Widgets.so.5 / libQt5Core.so.5 → build the panel with Qt5
+  If you see libQt6Widgets.so.6 / libQt6Core.so.6 → build the panel with Qt6
+What we used in this project: on our setup, rviz2 was linked to Qt5, so the plugin was built with Qt5:
+  find_package(Qt5 REQUIRED COMPONENTS Widgets)
+  target_link_libraries(pioneer_dashboard_panel Qt5::Widgets ...)
+After changing Qt versions in CMake, do a clean rebuild to clear cached Qt settings:
+```
+cd ~/ros2_ws
+rm -rf build install log
+colcon build --symlink-install
+```
+Note (Laptop vs Robot): your robot and laptop may have different RViz builds, so always run the ldd $(which rviz2) check on the machine that will run RViz.
