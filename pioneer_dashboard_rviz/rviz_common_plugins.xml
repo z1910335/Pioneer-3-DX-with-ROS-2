@@ -1,0 +1,7 @@
+<library path="pioneer_dashboard_panel">
+  <class
+    type="pioneer_dashboard_rviz::DashboardPanel"
+    base_class_type="rviz_common::Panel">
+    <description>Pioneer dashboard: camera + lidar mini-view + teleop</description>
+  </class>
+</library>
