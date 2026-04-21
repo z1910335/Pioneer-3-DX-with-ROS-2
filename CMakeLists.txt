@@ -14,6 +14,7 @@ find_package(sensor_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(pioneer_msgs REQUIRED)
 find_package(ament_cmake_python REQUIRED)
+find_package(std_srvs REQUIRED)
 
 
 # ARIA
@@ -26,6 +27,7 @@ ament_target_dependencies(base_controller
   rclcpp
   geometry_msgs
   pioneer_msgs
+  std_srvs
 )
 
 install(TARGETS

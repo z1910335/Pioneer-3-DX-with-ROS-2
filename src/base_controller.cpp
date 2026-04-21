@@ -3,6 +3,12 @@
 
 #include <Aria.h>
 
+#include <std_srvs/srv/trigger.hpp>
+#include <mutex>
+#include <chrono>
+
+#include <cmath>
+
 class PioneerBaseNode : public rclcpp::Node
 {
 public:
@@ -13,6 +19,16 @@ public:
     cmd_sub_ = this->create_subscription<geometry_msgs::msg::Twist>(
       "cmd_vel", 10,
       std::bind(&PioneerBaseNode::cmdVelCallback, this, _1));
+
+    // Torch parameters (optional)
+    torch_od_pin_   = this->declare_parameter<int>("torch_od_pin", 6);
+    torch_pulse_ms_ = this->declare_parameter<int>("torch_pulse_ms", 200);
+
+    // Torch service: /pioneer_base/torch_pulse
+    torch_srv_ = this->create_service<std_srvs::srv::Trigger>(
+      "~/torch_pulse",
+      std::bind(&PioneerBaseNode::torchPulseCb, this,
+                std::placeholders::_1, std::placeholders::_2));
   }
 
 private:
@@ -34,8 +50,83 @@ private:
     robot_->unlock();
   }
 
+  void torchPulseCb(
+    const std::shared_ptr<std_srvs::srv::Trigger::Request>,
+    std::shared_ptr<std_srvs::srv::Trigger::Response> res)
+  {
+    if (!robot_ || !robot_->isConnected()) {
+      res->success = false;
+      res->message = "Robot not connected";
+      return;
+    }
+
+    const int pin = torch_od_pin_;
+    const int ms  = torch_pulse_ms_;
+
+    if (pin < 0 || pin > 30) {
+      res->success = false;
+      res->message = "Invalid torch_od_pin (expected 0..30)";
+      return;
+    }
+
+    const int bit = (1 << pin);
+
+    // Turn ON (preserve other digout bits)
+    {
+      std::lock_guard<std::mutex> g(digout_mtx_);
+      digout_mask_ |= bit;
+
+      robot_->lock();
+      robot_->comInt(ArCommands::DIGOUT, digout_mask_);
+      robot_->unlock();
+    }
+
+    // Cancel any pending OFF timer and schedule a new one-shot OFF
+    if (torch_off_timer_) {
+      torch_off_timer_->cancel();
+      torch_off_timer_.reset();
+    }
+
+    torch_off_timer_ = this->create_wall_timer(
+      std::chrono::milliseconds(ms),
+      [this, bit]()
+      {
+        if (!robot_ || !robot_->isConnected()) {
+          // best effort cleanup
+          std::lock_guard<std::mutex> g(digout_mtx_);
+          digout_mask_ &= ~bit;
+          return;
+        }
+
+        std::lock_guard<std::mutex> g(digout_mtx_);
+        digout_mask_ &= ~bit;
+
+        robot_->lock();
+        robot_->comInt(ArCommands::DIGOUT, digout_mask_);
+        robot_->unlock();
+
+        // one-shot timer cleanup
+        torch_off_timer_->cancel();
+        torch_off_timer_.reset();
+      }
+    );
+
+    res->success = true;
+    res->message = "Torch pulse scheduled";
+  }
+
   ArRobot* robot_;
+
   rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmd_sub_;
+
+  // Torch service + state
+  rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr torch_srv_;
+  int torch_od_pin_{6};
+  int torch_pulse_ms_{200};
+
+  int digout_mask_{0};
+  std::mutex digout_mtx_;
+  rclcpp::TimerBase::SharedPtr torch_off_timer_;
 };
 
 int main(int argc, char** argv)
